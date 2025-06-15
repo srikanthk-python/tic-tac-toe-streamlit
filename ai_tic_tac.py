@@ -36,5 +36,50 @@ def is_draw():
             return False
     return True
 
-#
+# Computer move logic (random available cell)
+def computer_move():
+    available = [(i, j) for i in range(3) for j in range(3) if st.session_state.board[i][j] == ""]
+    if available:
+        i, j = random.choice(available)
+        st.session_state.board[i][j] = "O"
+        if check_winner():
+            st.success("💻 Computer (O) wins!")
+            st.session_state.game_over = True
+        elif is_draw():
+            st.info("😐 It's a draw!")
+            st.session_state.game_over = True
+        else:
+            st.session_state.current_player = "X"
 
+# Player move logic
+def make_move(i, j):
+    if not st.session_state.game_over and st.session_state.board[i][j] == "":
+        st.session_state.board[i][j] = "X"
+        if check_winner():
+            st.success("🎉 You (X) win!")
+            st.session_state.game_over = True
+        elif is_draw():
+            st.info("😐 It's a draw!")
+            st.session_state.game_over = True
+        else:
+            st.session_state.current_player = "O"
+            computer_move()
+
+# Draw the game board
+for i in range(3):
+    cols = st.columns(3)
+    for j in range(3):
+        button_label = st.session_state.board[i][j] or " "
+        if cols[j].button(button_label, key=f"{i}-{j}", use_container_width=True):
+            if st.session_state.current_player == "X":
+                make_move(i, j)
+
+# Show current player
+if not st.session_state.game_over:
+    st.markdown(f"**Current Player:** `{st.session_state.current_player}`")
+
+# Reset button
+if st.button("🔁 Reset Game"):
+    st.session_state.board = [["" for _ in range(3)] for _ in range(3)]
+    st.session_state.current_player = "X"
+    st.session_state.game_over = False
