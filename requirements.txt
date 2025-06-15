@@ -1,1 +1,1 @@
-streanlit
+streamlit>=1.30.0
